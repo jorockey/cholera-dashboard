@@ -5,6 +5,28 @@
 	<script src="https://d3js.org/d3.v3.min.js"></script>
 	<script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 	<style>
+
+		.header {
+		    grid-area: header;
+		    background-color: #D8DCE1;
+		    height: 80px;
+		}
+
+		#title { 
+			font-size: 1.5em;
+			margin-left: 20px;
+			float: left;
+			margin-top: 20px;
+		}
+
+		.header h3 { 
+			display: inline; 
+			text-align: right;
+			float: right;
+			margin-right: 20px;
+			margin-top: 25px; 
+		}
+
     	text { 
 			font-family: Arial; 
 			font-size: 15px;
@@ -34,6 +56,11 @@
 	</style>
 </head>
 <body>
+
+	<div class="header">
+		<h3 id="title">London's 1854 Cholera Epidemic</h3>
+		<h3>Visualization by Jonah Rockey</h3>
+	</div>
 
 	<svg id="age_distribution" width="700" height="400">
 		<text id='label' x='320' y='100'> Age Distribution Plot</text>
