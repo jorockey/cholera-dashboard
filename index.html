@@ -53,6 +53,17 @@
 			padding-top: 5px;
 			padding-bottom: 5px;
 		}
+
+		#top_graphs {
+			box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+			margin: 20px;
+		}
+
+		#bottom_graphs {
+			box-shadow: 0 4px 8px 0 rgb(0 0 0 / 20%), 0 6px 20px 0 rgb(0 0 0 / 19%);
+			margin: 20px;
+		}
+
 	</style>
 </head>
 <body>
@@ -62,36 +73,46 @@
 		<h3>Visualization by Jonah Rockey</h3>
 	</div>
 
-	<svg id="age_distribution" width="700" height="400">
-		<text id='label' x='320' y='100'> Age Distribution Plot</text>
-		<g transform="translate(150,400)"></g>
+	<!-- SVG's for age and gender bar graphs -->
+	<div id="top_graphs">
+
+	<svg id="age_graph" width="700" height="400">
+		<text id='label' x='350' y='170' style="font-weight: bold;">Death by Age</text>
+		<g transform="translate(150,450)"></g>
 	</svg>
 
-	<svg id="gender_distribution" width="550" height="400">
-		<text id='label' x='150' y='20'> Gender Distribution Plot</text>
-		<g transform="translate(150,400)"></g>
+	<svg id="gender_graph" width="550" height="400">
+		<text id='label' x='190' y='100' style="font-weight: bold;">Death by Gender</text>
+		<g transform="translate(150,490)"></g>
 	</svg>
 
-	<p>
+	</div>
+
+	<!-- Create day range sliders and update button -->
+	<div id="bottom_graphs">
+
+	<p style="position: relative; left: 350px; top: 200px">
   	<label for="Day1" 
          style="display: inline-block; width: 240px; text-align: right">
          Start Day: <span id="Day1-value">…</span>
   	</label>
   	<input type="range" min="1" max="42" id="Day1">
 	</p>
-
-	<p>
+ 
+	<p style="position: relative; left: 345px; top: 200px">
 	  <label for="Day2" 
 	         style="display: inline-block; width: 240px; text-align: right">
 	         End Day: <span id="Day2-value">…</span>
 	  </label>
 	  <input type="range" min="1" max="42" id="Day2">
 	</p>
-	<div id="option">
+	
+	<div id="option" style = "position :relative; left: 500px; top: 200px">
 	    <input name="updateButton" 
 	           type="button" 
 	           value="Update Map" 
-	           onclick="updateData(day1,day2)" />
+	           onclick="updateMap(day1,day2)" />
+	</div>
 	</div>
 	
 	<script>
@@ -150,7 +171,7 @@
   			.attr('class', 'graph-tip')
 	  		.offset([-10, 0])
   			.html(function(d) {
-    			return "<strong>Cumulative Deaths: </strong> <span>" + d.total + "</span></br>";
+    			return "<strong>Deaths on Day <span>" + d.day + ": </span></strong><span>" + d.deaths + "</span> <br> <strong>Cumulative Deaths: </strong> <span>" + d.total + "</span></br>";
   			});
 
 		
@@ -164,7 +185,8 @@
 			xScale.domain([0,15]).range([0, CHART_WIDTH]);	
 			yScale.domain([15,0]).range( [0,CHART_HEIGHT]);
 
-	    	var g = d3.select("body")				
+	    	// Create SVG and draw the map
+	    	var g = d3.select("#bottom_graphs")				
 			    .append("svg")
 			    .attr("id","main")
 			    .attr("width", "550")
@@ -173,8 +195,7 @@
        			    g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
       			}))
       			.append("g")
-			 	.attr("transform","translate(-50,150) ");
-
+			 	.attr("transform","translate(-50,200) ");
 
 	    	var lines_path = d3.svg.line()
 				.x(function(d) { return xScale(d.x); })
@@ -189,7 +210,7 @@
     			.attr("class", "map")
     			.attr("d", lines_path)
 
-
+    		// Draw death dots
     		drawDeaths(data)
 
     		// Draw pumps as black rectangles
@@ -264,10 +285,21 @@
  		 		.attr("text-anchor", "middle")
   				.attr("transform", "translate(506,-8) rotate(67)")
   				.text("Dean Street")
+
+  			// Draw title
+  			g.append("text")
+  				.style("fill", "black")
+  				.style("font-size", "16px")
+  				.style("font-weight", "bold")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(355,-160)")
+  				.text("Map of London")
 	    }
 	   
 
-	    function drawDeaths(data) {
+	    function drawDeaths(data) 
+	    {
 
 	    	// Create scales
 			var xScale = d3.scale.linear();
@@ -302,19 +334,22 @@
 	    function drawTimeline() 
 	    {
 
-	    	var g = d3.select("body")				
+	    	// Create SVG
+	    	var g = d3.select("#bottom_graphs")				
 			    .append("svg")
 			    .attr("id","timeline")
       			.attr("width", "700")
                 .attr("height", "700")
      			.append("g")
-			  	.attr("transform","translate(50,350)");
+			  	.attr("transform","translate(50,425)");
 
+			// Create scales
 			var xScale = d3.scale.ordinal();
 			var yScale = d3.scale.linear();
-			xScale.domain(deathdays.map(function(d) { return d.date; })).rangeRoundBands([0, 520], 0.1);
-			
-			yScale.domain([0,15]).range([0,50]);			
+
+			xScale.domain(deathdays.map(function(d) { return d.date; }))
+				.rangeRoundBands([0, 520], 0.1);
+			yScale.domain([0,15]).range([0,50]);		
 
 			var rect = d3.select('#timeline')
 				.select('g')
@@ -323,8 +358,8 @@
 
 			var xAxis = d3.svg.axis()
     			.scale(xScale)
-    		 	.orient("bottom")			
-			
+    		 	.orient("bottom");
+
   			d3.select('#timeline')
   				.select('g').append('g')
       			.attr("class", "axis")
@@ -336,13 +371,13 @@
    			   	.attr("dy", ".35em")
     			.attr("transform", "rotate(90)")
    			   	.style("text-anchor", "start");
-		
 
 			rect.enter().append("rect")
 			  	.attr("width", 10)
 			  	.attr("height", function (d){return yScale(d.deaths); }) 
-			  
-
+			
+			// Position bars and increase the size of the corresponding dots
+			// on the map with mouseover
 			rect
 			  	.attr("class", "bar1")
 			  	.attr("x", function (d){ return xScale(d.date); })
@@ -361,18 +396,7 @@
 						.attr('r', '3px')
 			  	});
 
-
-			d3.select("#Day1").on("input", function() {
-  			    day1=this.value
-			    updateDay1(+this.value);
-			});
-
-			d3.select("#Day2").on("input", function() {
-  			    day2=this.value
-			    updateDay2(+this.value);
-			});
-				
-			
+			// Create functions that update day1 and day2 for range slider
 			function updateDay1(Day1) {
   			  	// adjust the text on the range slider
   				d3.select("#Day1-value").text(Day1);
@@ -385,26 +409,40 @@
   			  	d3.select("#Day2").property("value", Day2);  
   			}
 
+  			// Update day1 and day2
+			d3.select("#Day1").on("input", function() {
+  			    day1=this.value
+			    updateDay1(+this.value);
+			});
+
+			d3.select("#Day2").on("input", function() {
+  			    day2=this.value
+			    updateDay2(+this.value);
+			});
 			
+			// Title
 			g.append("text")
   				.style("fill", "black")
   				.style("font-size", "16px")
+  				.style("font-weight", "bold")
   				.attr("dy", ".35em")
  		 		.attr("text-anchor", "middle")
-  				.attr("transform", "translate(250,230)")
-  				.text("Timeline Graph")
+  				.attr("transform", "translate(220,-390)")
+  				.text("Timeline of Deaths per Day")
 	    }
 
 
 	    function drawAge()
 		{
+
 			var xScale = d3.scale.ordinal();
 			var yScale = d3.scale.linear();
-			xScale.domain(death_ages.map(function(d) { return d.age; })).rangeRoundBands([0, 510], 0.1);
-			
+
+			xScale.domain(death_ages.map(function(d) { return d.age; }))
+				.rangeRoundBands([0, 510], 0.1);
 			yScale.domain([0,200]).range( [0,150]);			
 
-			var rect = d3.select('#age_distribution')
+			var rect = d3.select('#age_graph')
 				.select('g')
 				.selectAll(".bar2")
 				.data(death_ages);
@@ -413,7 +451,7 @@
     			.scale(xScale)
     		 	.orient("bottom")			
 	  
- 			d3.select('#age_distribution').select('g').append('g')
+ 			d3.select('#age_graph').select('g').append('g')
       			.attr("class", "axis")
       			.attr("transform","translate(0," +-130 + ")")
             	.call(xAxis)
@@ -424,38 +462,86 @@
     			.attr("transform", "rotate(0)")
    			    .style("text-anchor", "start");
 		
-
 			rect.enter().append("rect")
 			  	.attr("width", 38)
 			  	.attr("height", function (d){return yScale(d.deaths); }) 
 			  
-
 			rect.attr("class", "bar2")
-				.attr("x", function (d) {return xScale(d.age); })
-				.attr("y", function (d){ return -130- yScale(d.deaths); })
+				.attr("x", function (d) {return 17 + xScale(d.age); })
+				.attr("y", function (d){ return -130 - yScale(d.deaths); })
+
+			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(45,-245)")
+  				.text("142");
+
+  			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(128,-175)")
+  				.text("48");
+
+  			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(212,-183)")
+  				.text("58")
+
+  			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(296,-182)")
+  				.text("57")
+
+  			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(379,-208)")
+  				.text("91")
+
+  			d3.select('#age_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(461,-270)")
+  				.text("174")
 		}
 
 
 		function drawGender()
 		{
+
 			var xScale = d3.scale.ordinal();
 			var yScale = d3.scale.linear();
-			xScale.domain(gender.map(function(d) { return d.gender; })).rangeRoundBands([0, 210], 0.1);
 			
-			yScale.domain([0,200]).range( [0,150]);			
+			xScale.domain(gender.map(function(d) { return d.gender; }))
+				.rangeRoundBands([0, 210], 0.1);
+			yScale.domain([0,200]).range([0,150]);			
 
-			var rect = d3.select('#gender_distribution')
+			var rect = d3.select('#gender_graph')
 				.select('g')
 				.selectAll(".bar2")
 				.data(gender);
 
 			var xAxis = d3.svg.axis()
     			.scale(xScale)
-    		 	.orient("bottom")			
-	  
- 			d3.select('#gender_distribution').select('g').append('g')
+    		 	.orient("bottom")	
+
+    		d3.select('#gender_graph').select('g').append('g')
       			.attr("class", "axis")
-      			.attr("transform","translate(0," +-130 + ")")
+      			.attr("transform","translate(0," + -130 + ")")
             	.call(xAxis)
 			    .selectAll("text")
    			    .attr("y", 13)
@@ -463,7 +549,6 @@
    			    .attr("dy", ".35em")
     			.attr("transform", "rotate(0)")
    			    .style("text-anchor", "start");
-		
 
 			rect.enter().append("rect")
 			   	.attr("width", 47)
@@ -471,12 +556,30 @@
 			  	.style("fill", function (d){if(d.gender=='male') return "rgb(238,68,47)"; else return "rgb(99,172,190)"})
 
 			rect.attr("class", "bar2")
-			  	.attr("x", function (d) {return xScale(d.gender); })
-			  	.attr("y", function (d){ return -130- yScale(d.deaths); })
-			 
+			  	.attr("x", function (d) {return 19 + xScale(d.gender); })
+			  	.attr("y", function (d){ return -130 - yScale(d.deaths); })
+
+			d3.select('#gender_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(52,-353)")
+  				.text("284");
+
+  			d3.select('#gender_graph').select('g').append('text')
+		      	.style("fill", "black")
+  				.style("font-size", "16px")
+  				.attr("dy", ".35em")
+ 		 		.attr("text-anchor", "middle")
+  				.attr("transform", "translate(153,-355)")
+  				.text("287"); 
 		}	
 
-		function updateData(day1,day2) {
+
+		// Function to update the map with new range of days
+		function updateMap(day1,day2) 
+		{
 
 			var start;
 			var end;
@@ -496,10 +599,8 @@
 			}
 
 			drawDeaths(deaths.slice(start, end));
-		}
+		}	
 		
 	</script>
 </body>
-
-
 </html>
