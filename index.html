@@ -64,6 +64,17 @@
 			margin: 20px;
 		}
 
+		.column {
+		  	float: left;
+		  	width: 50%;
+		}
+
+		.row:after {
+		  	content: "";
+		  	display: table;
+		  	clear: both;
+		}
+
 	</style>
 </head>
 <body>
@@ -89,9 +100,11 @@
 	</div>
 
 	<!-- Create day range sliders and update button -->
-	<div id="bottom_graphs">
+	<div class="row" id="bottom_graphs">
 
-	<p style="position: relative; left: 350px; top: 200px">
+	<div class="column" id="timeline_col"></div>
+	<div class="column" id="map_col">
+	<p style="position: relative; right: 345px; top: 150px">
   	<label for="Day1" 
          style="display: inline-block; width: 240px; text-align: right">
          Start Day: <span id="Day1-value">…</span>
@@ -99,7 +112,7 @@
   	<input type="range" min="1" max="42" id="Day1">
 	</p>
  
-	<p style="position: relative; left: 345px; top: 200px">
+	<p style="position: relative; right: 345px; top: 150px">
 	  <label for="Day2" 
 	         style="display: inline-block; width: 240px; text-align: right">
 	         End Day: <span id="Day2-value">…</span>
@@ -107,11 +120,12 @@
 	  <input type="range" min="1" max="42" id="Day2">
 	</p>
 	
-	<div id="option" style = "position :relative; left: 500px; top: 200px">
+	<div id="option" style = "position :relative; right: 190px; top: 150px">
 	    <input name="updateButton" 
 	           type="button" 
 	           value="Update Map" 
 	           onclick="updateMap(day1,day2)" />
+	</div>
 	</div>
 	</div>
 	
@@ -186,7 +200,7 @@
 			yScale.domain([15,0]).range( [0,CHART_HEIGHT]);
 
 	    	// Create SVG and draw the map
-	    	var g = d3.select("#bottom_graphs")				
+	    	var g = d3.select("#map_col")				
 			    .append("svg")
 			    .attr("id","main")
 			    .attr("width", "550")
@@ -195,7 +209,7 @@
        			    g.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
       			}))
       			.append("g")
-			 	.attr("transform","translate(-50,200) ");
+			 	.attr("transform","translate(-50,168) ");
 
 	    	var lines_path = d3.svg.line()
 				.x(function(d) { return xScale(d.x); })
@@ -335,13 +349,13 @@
 	    {
 
 	    	// Create SVG
-	    	var g = d3.select("#bottom_graphs")				
+	    	var g = d3.select("#timeline_col")				
 			    .append("svg")
 			    .attr("id","timeline")
       			.attr("width", "700")
                 .attr("height", "700")
      			.append("g")
-			  	.attr("transform","translate(50,425)");
+			  	.attr("transform","translate(50,510)");
 
 			// Create scales
 			var xScale = d3.scale.ordinal();
@@ -600,7 +614,7 @@
 
 			drawDeaths(deaths.slice(start, end));
 		}	
-		
+
 	</script>
 </body>
 </html>
